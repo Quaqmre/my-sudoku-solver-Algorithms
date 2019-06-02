@@ -43,7 +43,7 @@ namespace Test
             var x = gm.initilizer(ar);
             //Assert
             foreach (var item in x)
-                Assert.Equal(true, item == 0);
+                Assert.True(item == 0);
         }
         //looperTest
         [Theory]
@@ -92,7 +92,7 @@ namespace Test
                 for (int ii = 0; ii < gameLimit; ii++)
                     ar[i, ii] = i * gameLimit + ii;
             //Act
-            colList = gm.getColChildValue(rndRow, rndCol, ar);
+            colList = gm.getColChildItems(rndRow, rndCol, ar);
             listLenght = colList.ToArray().Length;
             //Assert
             Assert.Equal(value, listLenght);
@@ -116,7 +116,7 @@ namespace Test
                 for (int ii = 0; ii < gameLimit; ii++)
                     ar[i, ii] = i * gameLimit + ii;
             //Act
-            colList = gm.getRowChildValue(rndRow, rndCol, ar);
+            colList = gm.getRowChildItems(rndRow, rndCol, ar);
             listLenght = colList.ToArray().Length;
             //Assert
             Assert.Equal(value, listLenght);
@@ -125,7 +125,7 @@ namespace Test
         [InlineData(2)]
         [InlineData(3)]
         [InlineData(8)]
-        public void getColChildValues_Metot_Should_Return_All_Selected_ColValueList(int col)
+        public void getColChildItems_Metot_Should_Return_All_Selected_ColValueList(int col)
         {
             //Arrange
             List<int> colList = new List<int>();
@@ -143,7 +143,7 @@ namespace Test
                 colList.Add(item);
             }
             //Act
-            var smpleColList = gm.getColChildValue(0, slctCol, ar);
+            var smpleColList = gm.getColChildItems(0, slctCol, ar);
             List<int> tt = colList.Except(smpleColList).ToList();
             //Assert
             Assert.Equal(0, tt.Count());
@@ -153,7 +153,7 @@ namespace Test
         [InlineData(2)]
         [InlineData(3)]
         [InlineData(8)]
-        public void getRowChildValues_Metot_Should_Return_All_Selected_RowValueList(int row)
+        public void getRowChildItems_Metot_Should_Return_All_Selected_RowValueList(int row)
         {
             //Arrange
             List<int> rowList = new List<int>();
@@ -171,10 +171,65 @@ namespace Test
                 rowList.Add(item);
             }
             //Act
-            var smpleColList = gm.getRowChildValue(slctRow, 0, ar);
+            var smpleColList = gm.getRowChildItems(slctRow, 0, ar);
             List<int> tt = rowList.Except(smpleColList).ToList();
             //Assert
             Assert.Equal(0, tt.Count());
         }
+        [Theory]
+        [InlineData(0, 0, 0)]
+        [InlineData(2, 6, 2)]
+        [InlineData(5, 3, 4)]
+        [InlineData(8, 8, 8)]
+        public void getChildBoxInfo_Metot_Should_Return_Selected_ChildBoxInfo(int row, int col, int expected)
+        {
+            //Arrange
+            int getBoxInfo = -1;
+            int gameLimit = 9;
+            Game gm = new Game(gameLimit);
+            //Act
+            getBoxInfo = gm.getChildBoxInfo(row, col);
+            //Assert
+            Assert.Equal(expected, getBoxInfo);
+        }
+        [Theory]
+        [InlineData(0, 9)]
+        [InlineData(3, 9)]
+        [InlineData(6, 9)]
+        [InlineData(8, 9)]
+        public void getChildBoxItems_Metot_Should_Equal_Selected_ChildBoxItems(int boxInfo, int gameLimit)
+        {
+            //Arrange
+            List<int> boxİtemList = new List<int>() { 0, 1, 2, 9, 10, 11, 18, 19, 20 };
+            Game gm = new Game(gameLimit);
+            int[,] ar = new int[gameLimit, gameLimit];
+            for (int i = 0; i < gameLimit; i++)
+                for (int ii = 0; ii < gameLimit; ii++)
+                    ar[i, ii] = i * gameLimit + ii;
+            //Act
+            var getBoxItems = gm.getChildBoxItems(boxInfo, ar);
+            //Assert
+            Assert.Equal(boxİtemList.Count(), getBoxItems.Count());
+        }
+        [Theory]
+        [InlineData(0, 9)]
+        public void getChildBoxItems_Metot_Should_Return_Selected_ChildBoxItems(int boxInfo, int gameLimit)
+        {
+            //Arrange
+            List<int> boxİtemList = new List<int>() { 0, 1, 2, 9, 10, 11, 18, 19, 20 };
+            Game gm = new Game(gameLimit);
+            int[,] ar = new int[gameLimit, gameLimit];
+            for (int i = 0; i < gameLimit; i++)
+                for (int ii = 0; ii < gameLimit; ii++)
+                    ar[i, ii] = i * gameLimit + ii;
+            //Act
+            var getBoxItems = gm.getChildBoxItems(boxInfo, ar);
+            List<int> tt = getBoxItems.Except(boxİtemList).ToList();
+
+            //Assert
+            Assert.Equal(0, tt.Count());
+        }
+
+
     }
 }
