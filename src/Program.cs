@@ -19,11 +19,9 @@ namespace new_born_sudoku
             object t = new object();
             Game game = new Game(gameLimit);
             int[,] array = new int[gameLimit, gameLimit];
-            var inarray = game.initilizer(array);
-            var a = game.getColChildValue(0, 0, array);
-            // game.looper(gameLimit, gameLimit, inarray, d);
+            array[0, 0] = 10;
+            var childbox = game.getChildBoxItems(3, array);
             System.Console.WriteLine(toplam);
-
         }
     }
 }
