@@ -240,13 +240,13 @@ namespace Test
         }
         [Theory]
         [InlineData(new int[] { 1, 10, 3, 4 }, new int[] { 3, 1, 7, 3 }, new int[] { 5 })]
-        public void getAllNonValues_Metot_Should_Return_Uniq_Value_inLists(int[] list1, int[] list2, int[] list3)
+        public void getAllUniqValues_Metot_Should_Return_Uniq_Value_inLists(int[] list1, int[] list2, int[] list3)
         {
             //Arrange
             List<int> addedList = new List<int>() { 1, 3, 4, 5, 7, 10 };
             Game gm = new Game(9);
             //Act
-            List<int> uniqItemsofList = gm.getAllNonValues(list1.ToList(), list2.ToList(), list3.ToList());
+            List<int> uniqItemsofList = gm.getAllUniqValues(list1.ToList(), list2.ToList(), list3.ToList());
             var zero = addedList.Except(uniqItemsofList).OrderBy(x => x);
             //Asser
             Assert.Equal(addedList.OrderBy(x => x), uniqItemsofList);
@@ -256,13 +256,13 @@ namespace Test
         [InlineData(new int[] { 5, 1, 9, 3 }, new int[] { 7, 0, 2, 2 }, new int[] { 5, 4, 3 }, 7)]
         [InlineData(new int[] { 1, 2, 3, 1 }, new int[] { 1, 3, 2, 1 }, new int[] { 1, 1, 2, 2, 3, 3 }, 3)]
         [InlineData(new int[] { }, new int[] { }, new int[] { }, 0)]
-        public void getAllNonValues_Metot_Should_Return_Expected_Lenght(int[] list1, int[] list2, int[] list3, int expectedLenght)
+        public void getAllUniqValues_Metot_Should_Return_Expected_Lenght(int[] list1, int[] list2, int[] list3, int expectedLenght)
         {
             //Arrange
             Game gm = new Game(9);
             int lenght = 0;
             //Act
-            List<int> uniqItemsofList = gm.getAllNonValues(list1.ToList(), list2.ToList(), list3.ToList());
+            List<int> uniqItemsofList = gm.getAllUniqValues(list1.ToList(), list2.ToList(), list3.ToList());
             lenght = uniqItemsofList.Count();
             //Asser
             Assert.Equal(expectedLenght, lenght);
@@ -271,13 +271,13 @@ namespace Test
         [InlineData(0, 9)]
         [InlineData(8, 9)]
         [InlineData(3, 16)]
-        public void getNeighborBox_Metot_Should_Return_Two_NeighborRow(int row, int gameLimit)
+        public void get2NeighborItem_Metot_Should_Return_Two_NeighborRow(int row, int gameLimit)
         {
             //Arrange
             Game gm = new Game(gameLimit);
             int expectedLenght = (int)Math.Sqrt((double)gameLimit) - 1;
             //Act
-            List<int> neigborRow = gm.getNeighborBox(row, gameLimit);
+            List<int> neigborRow = gm.get2NeighborItem(row, gameLimit);
             //Assert
             Assert.Equal(expectedLenght, neigborRow.Count());
         }
@@ -288,12 +288,12 @@ namespace Test
         [InlineData(4, new int[] { 3, 5 }, 9)]
         [InlineData(4, new int[] { 5, 6, 7 }, 16)]
         [InlineData(14, new int[] { 12, 13, 15 }, 16)]
-        public void getNeighborBox_Metot_Should_Return_List_NeighborRow(int row, int[] expectedList, int gameLimit)
+        public void get2NeighborItem_Metot_Should_Return_List_NeighborRow(int row, int[] expectedList, int gameLimit)
         {
             //Arrange
             Game gm = new Game(gameLimit);
             //Act
-            List<int> neigborRow = gm.getNeighborBox(row, gameLimit);
+            List<int> neigborRow = gm.get2NeighborItem(row, gameLimit);
             //Assert
             Assert.Equal(expectedList.ToList(), neigborRow);
         }
@@ -305,15 +305,51 @@ namespace Test
         [InlineData(8, 9, new int[] { 6, 7 })]
         [InlineData(14, 16, new int[] { 12, 13, 15 })]
         [InlineData(10, 16, new int[] { 8, 9, 11 })]
-        public void getNeighborBox_Metot_Should_Return_Expected_List(int row, int gameLimit, int[] expectedList)
+        public void get2NeighborItem_Metot_Should_Return_Expected_List(int row, int gameLimit, int[] expectedList)
         {
             //Arrange
             Game gm = new Game(gameLimit);
             //Act
-            List<int> neigborRow = gm.getNeighborBox(row, gameLimit);
+            List<int> neigborRow = gm.get2NeighborItem(row, gameLimit);
             List<int> shouldZero = expectedList.Except(neigborRow).ToList();
             //Assert
             Assert.Equal(0, shouldZero.Count());
+        }
+
+        [Theory]
+        [InlineData(0, 9)]
+        [InlineData(3, 9)]
+        [InlineData(6, 9)]
+        [InlineData(12, 16)]
+        public void getChildBoxItemsCordinat_Metot_Should_Return_FirstBoxItem_ColompZero(int boxInfo, int gameLimit)
+        {
+            //Arrange
+            Game gm = new Game(gameLimit);
+            int gameLimitsqr = (int)Math.Sqrt((double)gameLimit);
+
+            //Act
+            int[,] ar = new int[gameLimit, gameLimit];
+            for (int i = 0; i < gameLimit; i++)
+                for (int ii = 0; ii < gameLimit; ii++)
+                    ar[i, ii] = i % gameLimitsqr + ii;
+            List<(int r, int c)> neigborRow = gm.getChildBoxItemsCordinat(boxInfo, ar);
+            //Assert
+            Assert.Equal(0, neigborRow[0].c);
+        }
+        [Theory]
+        [InlineData(0, 3, 9, 0)]
+        [InlineData(7, 5, 9, 5)]
+        [InlineData(4, 5, 9, 5)]
+        public void getRankingInChildBox_Metot_Should_Return_InRankChildBox(int row, int col, int gameLimit, int expected)
+        {
+            //Arrange
+            Game gm = new Game(gameLimit);
+            int rank;
+            //Act
+            rank = gm.getRankingInChildBox(row, col);
+            //Assert
+            Assert.Equal(expected, rank);
+
         }
     }
 }

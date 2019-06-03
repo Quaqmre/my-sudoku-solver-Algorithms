@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using src;
+using System.Collections.Concurrent;
 
 namespace new_born_sudoku
 {
@@ -16,69 +17,75 @@ namespace new_born_sudoku
             var t = game.initilizer(gameTable);
             var table = game.setValues(gameTable);
             bool changed = false;
-            List<int> desk = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-            List<int> desk1 = new List<int>() { 0 };
-            List<int> row = new List<int>();
-            List<int> col = new List<int>();
-            List<int> box = new List<int>();
-            List<int> nonItems = new List<int>();
-            int boxinfo = 0;
+            List<int> desk = Enumerable.Range(1, gameLimit).ToList();
 
-            for (int i = 0; i < 9; i++)
-            {
-                if (i % 3 == 0)
-                    System.Console.WriteLine("\n---------------------");
-                else
-                    System.Console.WriteLine();
-                for (int ii = 0; ii < 9; ii++)
-                {
-                    if (ii % 3 == 0)
-                        System.Console.Write("|");
-                    System.Console.Write(table[i, ii] + " ");
-                }
-            }
+            game.drowTable(table);
             for (int i = 0; i < gameLimit; i++)
                 for (int ii = 0; ii < gameLimit; ii++)
                 {
+                    List<int> allColPossItems = new List<int>();
+                    List<int> allRowPossItems = new List<int>();
+                    var oneChangeAtomicBox = new ConcurrentDictionary<int, (int value, int rw, int cl)>();
+                    List<int> possibilty = new List<int>();
+                    int childboxinf = -1;
+                    List<(int rw, int cl)> v = new List<(int rw, int cl)>();
+
                     if (table[i, ii] == 0)
                     {
                         if (i == 4 && ii == 3)
                         {
 
                         }
+                        childboxinf = game.getChildBoxInfo(i, ii);
+                        v = game.getChildBoxItemsCordinat(childboxinf, table);
+                        foreach (var atomicBox in v)
+                        {
+                            var row = game.getRowChildItems(atomicBox.rw, atomicBox.cl, table);
+                            var col = game.getColChildItems(atomicBox.rw, atomicBox.cl, table);
+                            var boxinfo = game.getChildBoxInfo(atomicBox.rw, atomicBox.cl);
+                            var box = game.getChildBoxItems(boxinfo, table);
+                            var nonItems = game.getAllUniqValues(row, col, box);
+
+                            var rowNeighbors = game.get2NeighborItem(atomicBox.rw, gameLimit);
+                            var colNeighbors = game.get2NeighborItem(atomicBox.cl, gameLimit);
+
+                            var firstColPossItem = game.getPossiblyItems(atomicBox.rw, rowNeighbors[0], table, "c");
+                            var secondColPossItem = game.getPossiblyItems(atomicBox.rw, rowNeighbors[1], table, "c");
+                            allColPossItems.AddRange(firstColPossItem);
+                            allColPossItems.AddRange(secondColPossItem);
+
+                            var firstRowPossItem = game.getPossiblyItems(colNeighbors[0], atomicBox.cl, table, "r");
+                            var secondRowPossItem = game.getPossiblyItems(colNeighbors[1], atomicBox.cl, table, "r");
+                            allRowPossItems.AddRange(firstRowPossItem);
+                            allRowPossItems.AddRange(secondRowPossItem);
+
+                            var allPossItem = game.getAllUniqValues(allColPossItems, allRowPossItems);
+                            var localPossItems = allPossItem.Except(nonItems).ToList();
+                            foreach (var localpossitem in localPossItems)
+                                oneChangeAtomicBox.AddOrUpdate(localpossitem, (1, atomicBox.rw, atomicBox.cl), (key, currenvalue) => (++currenvalue.value, currenvalue.rw, currenvalue.cl));
+                            possibilty.AddRange(localPossItems);
+                        }
+                        foreach (var item in oneChangeAtomicBox)
+                            if (item.Value.value == 1)
+                            {
+                                table[item.Value.rw, item.Value.cl] = item.Key;
+                                changed = true;
+                            }
+
                         if (changed)
                         {
                             i = 0; ii = 0;
                             changed = false;
                         }
-                        row = game.getRowChildItems(i, ii, table);
-                        col = game.getColChildItems(i, ii, table);
-                        boxinfo = game.getChildBoxInfo(i, ii);
-                        box = game.getChildBoxItems(boxinfo, table);
-                        nonItems = game.getAllNonValues(row, col, box);
-                        List<int> nonZeroItems = nonItems.Except(desk1).ToList();
-
-                        if (nonZeroItems.Count() == 8)
-                        {
-                            table[i, ii] = (int)desk.Except(nonZeroItems).ToList().First();
-                            changed = true;
-                        }
                     }
                 }
-            System.Console.WriteLine("bitti");
-            for (int i = 0; i < 9; i++)
-            {
-                if (i % 3 == 0)
-                    System.Console.WriteLine("\n---------------------");
-                else
-                    System.Console.WriteLine();
-                for (int ii = 0; ii < 9; ii++)
-                {
-                    if (ii % 3 == 0)
-                        System.Console.Write("|");
-                    System.Console.Write(table[i, ii] + " ");
-                }
-            }
+            System.Console.WriteLine();
+            System.Console.WriteLine("----------------------");
+            game.drowTable(table);
+
+
+
+
 
 
 
