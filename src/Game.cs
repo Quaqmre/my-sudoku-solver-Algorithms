@@ -44,7 +44,8 @@ namespace src
             var localarray = ar;
             Action<int, int, int[,]> localact = (r, c, gt) =>
             {
-                rowValueList.Add(gt[r, c]);
+                if (gt[r, c] != 0)
+                    rowValueList.Add(gt[r, c]);
             };
             looper(localrow + 1, localcol, localarray, localact, localrow);
             return rowValueList;
@@ -57,7 +58,8 @@ namespace src
             var localarray = ar;
             Action<int, int, int[,]> localact = (r, c, gt) =>
             {
-                colValueList.Add(gt[r, c]);
+                if (gt[r, c] != 0)
+                    colValueList.Add(gt[r, c]);
             };
             looper(localrow, localcol + 1, localarray, localact, 0, localcol);
             return colValueList;
@@ -84,7 +86,8 @@ namespace src
 
             Action<int, int, int[,]> localact = (r, c, gt) =>
            {
-               boxValueList.Add(gt[r, c]);
+               if (gt[r, c] != 0)
+                   boxValueList.Add(gt[r, c]);
            };
             looper(startrow + gameLimitsqr, startcol + gameLimitsqr,
                     localarray, localact, startrow, startcol);
@@ -104,40 +107,128 @@ namespace src
 
             foreach (var item in allNonValuesToDict)
             {
-                dict.AddOrUpdate(item, 1, (key, currenvalue) => ++currenvalue);
+                if (item != 0)
+                    dict.AddOrUpdate(item, 1, (key, currenvalue) => ++currenvalue);
             }
             foreach (var item in dict.Keys)
                 allNonValues.Add(item);
 
             return allNonValues;
         }
-
-
-
-        public List<int> getNeighborBox(int currentBox)
+        public int[,] setValues(int[,] y)
         {
+            y[0, 0] = 3;
+            y[0, 1] = 0;
+            y[0, 2] = 0;
+            y[0, 3] = 6;
+            y[0, 4] = 0;
+            y[0, 5] = 8;
+            y[0, 6] = 0;
+            y[0, 7] = 0;
+            y[0, 8] = 1;
+            y[1, 0] = 0;
+            y[1, 1] = 5;
+            y[1, 2] = 0;
+            y[1, 3] = 0;
+            y[1, 4] = 1;
+            y[1, 5] = 0;
+            y[1, 6] = 0;
+            y[1, 7] = 7;
+            y[1, 8] = 0;
+            y[2, 0] = 0;
+            y[2, 1] = 0;
+            y[2, 2] = 2;
+            y[2, 3] = 0;
+            y[2, 4] = 0;
+            y[2, 5] = 0;
+            y[2, 6] = 4;
+            y[2, 7] = 0;
+            y[2, 8] = 0;
+            y[3, 0] = 6;
+            y[3, 1] = 0;
+            y[3, 2] = 0;
+            y[3, 3] = 4;
+            y[3, 4] = 0;
+            y[3, 5] = 7;
+            y[3, 6] = 0;
+            y[3, 7] = 0;
+            y[3, 8] = 5;
+            y[4, 0] = 0;
+            y[4, 1] = 2;
+            y[4, 2] = 0;
+            y[4, 3] = 0;
+            y[4, 4] = 8;
+            y[4, 5] = 0;
+            y[4, 6] = 0;
+            y[4, 7] = 6;
+            y[4, 8] = 0;
+            y[5, 0] = 9;
+            y[5, 1] = 0;
+            y[5, 2] = 0;
+            y[5, 3] = 2;
+            y[5, 4] = 0;
+            y[5, 5] = 6;
+            y[5, 6] = 0;
+            y[5, 7] = 0;
+            y[5, 8] = 4;
+            y[6, 0] = 0;
+            y[6, 1] = 0;
+            y[6, 2] = 9;
+            y[6, 3] = 0;
+            y[6, 4] = 0;
+            y[6, 5] = 0;
+            y[6, 6] = 8;
+            y[6, 7] = 0;
+            y[6, 8] = 0;
+            y[7, 0] = 0;
+            y[7, 1] = 4;
+            y[7, 2] = 0;
+            y[7, 3] = 0;
+            y[7, 4] = 6;
+            y[7, 5] = 0;
+            y[7, 6] = 0;
+            y[7, 7] = 3;
+            y[7, 8] = 0;
+            y[8, 0] = 2;
+            y[8, 1] = 0;
+            y[8, 2] = 0;
+            y[8, 3] = 5;
+            y[8, 4] = 0;
+            y[8, 5] = 1;
+            y[8, 6] = 0;
+            y[8, 7] = 0;
+            y[8, 8] = 9;
+
+            return y;
+        }
+
+
+
+        public List<int> getNeighborBox(int currentBox, int gamelimit)
+        {
+            int gamelimitsqr = (int)Math.Sqrt((double)gamelimit);
             List<int> neighborBox = new List<int>();
             int localrow = currentBox;
-            int trimedrow = localrow - localrow % 3;
+            int trimedRow = localrow - localrow % gamelimitsqr;
 
-            for (int i = 0; i < 3; i++)
-                if (trimedrow + i != localrow)
+            for (int i = 0; i < gamelimitsqr; i++)
+                if (trimedRow + i != localrow)
                 {
-                    neighborBox.Add(trimedrow + i);
+                    neighborBox.Add(trimedRow + i);
                 }
             return neighborBox;
         }
-        public List<int> getPossiblyItems(int row, int col, int[,] ar, in string selecter)
+        public List<int> getPossiblyItems(int row, int col, int[,] ar, in string selector)
         {
             int localrow = row;
             int localcol = col;
             int[,] localarray = ar;
-            List<int> constPosItems = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            List<int> constPosItems = Enumerable.Range(1, gameLimit).ToList();
             List<int> possİtems = new List<int>();
 
-            if (selecter == "r")
+            if (selector == "r")
                 possİtems = getRowChildItems(localrow, localcol, localarray);
-            if (selecter == "c")
+            if (selector == "c")
                 possİtems = getColChildItems(localrow, localcol, localarray);
 
             List<int> returnedItem = constPosItems.Except(possİtems).ToList();
