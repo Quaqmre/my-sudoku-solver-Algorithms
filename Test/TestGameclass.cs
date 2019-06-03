@@ -4,6 +4,7 @@ using new_born_sudoku;
 using src;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Concurrent;
 
 namespace Test
 {
@@ -200,7 +201,7 @@ namespace Test
         public void getChildBoxItems_Metot_Should_Equal_Selected_ChildBoxItems(int boxInfo, int gameLimit)
         {
             //Arrange
-            List<int> boxİtemList = new List<int>() { 0, 1, 2, 9, 10, 11, 18, 19, 20 };
+            int expected = gameLimit;
             Game gm = new Game(gameLimit);
             int[,] ar = new int[gameLimit, gameLimit];
             for (int i = 0; i < gameLimit; i++)
@@ -209,7 +210,7 @@ namespace Test
             //Act
             var getBoxItems = gm.getChildBoxItems(boxInfo, ar);
             //Assert
-            Assert.Equal(boxİtemList.Count(), getBoxItems.Count());
+            Assert.Equal(expected, getBoxItems.Count());
         }
         [Theory]
         [InlineData(0, 9)]
@@ -225,11 +226,78 @@ namespace Test
             //Act
             var getBoxItems = gm.getChildBoxItems(boxInfo, ar);
             List<int> tt = getBoxItems.Except(boxİtemList).ToList();
-
             //Assert
             Assert.Equal(0, tt.Count());
         }
-
-
+        [Theory]
+        [InlineData(new int[] { 1, 10, 3, 4 }, new int[] { 3, 1, 7, 3 }, new int[] { 5 })]
+        public void getAllNonValues_Metot_Should_Return_Uniq_Value_inLists(int[] list1, int[] list2, int[] list3)
+        {
+            //Arrange
+            List<int> addedList = new List<int>() { 1, 3, 4, 5, 7, 10 };
+            Game gm = new Game(9);
+            //Act
+            List<int> uniqItemsofList = gm.getAllNonValues(list1.ToList(), list2.ToList(), list3.ToList());
+            var zero = addedList.Except(uniqItemsofList).OrderBy(x => x);
+            //Asser
+            Assert.Equal(addedList.OrderBy(x => x), uniqItemsofList);
+        }
+        [Theory]
+        [InlineData(new int[] { 1, 2, 3, 4 }, new int[] { 5, 6, 7, 8 }, new int[] { 9, 10, 10 }, 10)]
+        [InlineData(new int[] { 5, 1, 9, 3 }, new int[] { 7, 0, 2, 2 }, new int[] { 5, 4, 3 }, 8)]
+        [InlineData(new int[] { 1, 2, 3, 1 }, new int[] { 1, 3, 2, 1 }, new int[] { 1, 1, 2, 2, 3, 3 }, 3)]
+        [InlineData(new int[] { }, new int[] { }, new int[] { }, 0)]
+        public void getAllNonValues_Metot_Should_Return_Expected_Lenght(int[] list1, int[] list2, int[] list3, int expectedLenght)
+        {
+            //Arrange
+            Game gm = new Game(9);
+            int lenght = 0;
+            //Act
+            List<int> uniqItemsofList = gm.getAllNonValues(list1.ToList(), list2.ToList(), list3.ToList());
+            lenght = uniqItemsofList.Count();
+            //Asser
+            Assert.Equal(expectedLenght, lenght);
+        }
+        [Theory]
+        [InlineData(0, 9)]
+        [InlineData(8, 9)]
+        [InlineData(3, 3)]
+        public void getNeighborRowBox_Metot_Should_Return_Two_NeighborRow(int row, int gameLimit)
+        {
+            //Arrange
+            Game gm = new Game(gameLimit);
+            int expectedLenght = 2;
+            //Act
+            List<int> neigborRow = gm.getNeighborBox(row);
+            //Assert
+            Assert.Equal(expectedLenght, neigborRow.Count());
+        }
+        [Theory]
+        [InlineData(0, new int[] { 1, 2 })]
+        [InlineData(8, new int[] { 6, 7 })]
+        [InlineData(4, new int[] { 3, 5 })]
+        public void getNeighborRowBox_Metot_Should_Return_List_NeighborRow(int row, int[] expectedList)
+        {
+            //Arrange
+            Game gm = new Game(9);
+            //Act
+            List<int> neigborRow = gm.getNeighborBox(row);
+            //Assert
+            Assert.Equal(expectedList.ToList(), neigborRow);
+        }
+        [Theory]
+        [InlineData(0, new int[] { 1, 2 })]
+        [InlineData(5, new int[] { 3, 4 })]
+        [InlineData(8, new int[] { 6, 7 })]
+        public void getNeighborRowBox_Metot_Should_Return_Expected_List(int row, int[] expectedList)
+        {
+            //Arrange
+            Game gm = new Game(9);
+            //Act
+            List<int> neigborRow = gm.getNeighborBox(row);
+            var shouldZero = expectedList.ToList().Except(neigborRow);
+            //Assert
+            Assert.Equal(expectedList.ToList(), neigborRow);
+        }
     }
 }
