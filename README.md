@@ -19,3 +19,4 @@
 
 # it was a fun and instructive process for me
 
+(.Net Core 2.2 , Console application)
