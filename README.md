@@ -14,6 +14,8 @@
  My other decision is I have to get some help M.I.T. lesson videos cause my methods cant fill all sudoku boxs,
  And the lesson videos have a great idea , you dont have to write all possibilties the Puzzle ,just write invariant rules with methods
  then let the processors to solve puzzle with  the huge processing capacity
+ 
+ ## Version 3 can solve sudoku examples...
 
 # it was a fun and instructive process for me
 
