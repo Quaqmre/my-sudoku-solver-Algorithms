@@ -1,10 +1,9 @@
 using System;
 using Xunit;
-using new_born_sudoku;
-using src;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Concurrent;
+using src;
 
 namespace Test
 {

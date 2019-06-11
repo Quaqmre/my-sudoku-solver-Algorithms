@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\newBornSudoku.csproj" />
+    <ProjectReference Include="..\src\newBornSudokuSolver-v2.csproj" />
   </ItemGroup>
 
 </Project>
